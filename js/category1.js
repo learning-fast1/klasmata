@@ -11,7 +11,24 @@ const Category1 = {
         Category1.currentQ = 0;
         
         if (stageNum === 1) {
-            // Unit fractions 1/2 – 1/9, big pool shuffled, take 10
+            // Μοναδιαία (εναδικά) κλάσματα, αντικείμενα = παρονομαστής
+            const pool = [
+                [1,2],[1,2],[1,2],
+                [1,3],[1,3],[1,3],
+                [1,4],[1,4],[1,4],
+                [1,5],[1,5],[1,5],
+                [1,6],[1,6],[1,6],
+                [1,7],[1,7],
+                [1,8],[1,8],
+                [1,9],[1,9],
+            ];
+            Utils.shuffle(pool);
+            Category1.questions = pool.slice(0, 10).map(f => {
+                return { num: f[0], den: f[1], total: f[1], target: 1 };
+            });
+        }
+        else if (stageNum === 2) {
+            // Εναδικά κλάσματα, αντικείμενα > παρονομαστής
             const pool = [
                 [1,2],[1,2],[1,2],
                 [1,3],[1,3],[1,3],
@@ -30,16 +47,16 @@ const Category1 = {
                 return { num: f[0], den: f[1], total, target: total / f[1] };
             });
         }
-        else if (stageNum === 2) {
-            // 10 cases. Denominator = Total Objects (up to 15).
+        else if (stageNum === 3) {
+            // Όλα τα κλάσματα, αντικείμενα = παρονομαστής
             for (let i = 0; i < 10; i++) {
                 let den = Utils.randomInt(3, 15);
                 let num = Utils.randomInt(1, den - 1);
                 Category1.questions.push({ num, den, total: den, target: num });
             }
         }
-        else if (stageNum === 3) {
-            // 10 cases. Total objects > Denominator
+        else if (stageNum === 4) {
+            // Όλα τα κλάσματα, αντικείμενα > παρονομαστής
             for (let i = 0; i < 10; i++) {
                 let den = Utils.randomInt(2, 8);
                 let num = Utils.randomInt(1, den - 1);
@@ -48,8 +65,8 @@ const Category1 = {
                 Category1.questions.push({ num, den, total, target: num * multiplier });
             }
         }
-        else if (stageNum === 4) {
-            // 10 cases. Abstract calculation.
+        else if (stageNum === 5) {
+            // Πράξεις - Βρες το μέρος του αριθμού
             for (let i = 0; i < 10; i++) {
                 let den = Utils.randomInt(2, 12);
                 let num = Utils.randomInt(1, den - 1);
@@ -58,8 +75,8 @@ const Category1 = {
                 Category1.questions.push({ num, den, total, target: num * multiplier });
             }
         }
-        else if (stageNum === 5) {
-            // 10 cases. Find the whole: X/Y του ___ = result
+        else if (stageNum === 6) {
+            // Βρες τον κρυμμένο αριθμό: X/Y του ___ = result
             for (let i = 0; i < 10; i++) {
                 let num = Utils.randomInt(1, 7);
                 let den = Utils.randomInt(num + 1, num + 7);
@@ -84,7 +101,7 @@ const Category1 = {
         Category1.targetCount = q.target;
         
         let promptHtml = '';
-        if (Category1.stage === 4) {
+        if (Category1.stage === 5) {
              app.prepareGameArea(`Ερώτηση ${Category1.currentQ + 1} / ${Category1.questions.length}`, '');
 
              let area = document.getElementById('game-area');
@@ -99,7 +116,7 @@ const Category1 = {
                 </div>
              `;
              setTimeout(() => Utils.setActiveInput('answer-input'), 50);
-        } else if (Category1.stage === 5) {
+        } else if (Category1.stage === 6) {
              app.prepareGameArea(`Ερώτηση ${Category1.currentQ + 1} / ${Category1.questions.length}`, '');
 
              let area = document.getElementById('game-area');
@@ -144,7 +161,7 @@ const Category1 = {
     check: () => {
         let isCorrect = false;
         
-        if (Category1.stage === 4 || Category1.stage === 5) {
+        if (Category1.stage === 5 || Category1.stage === 6) {
             let input = document.getElementById('answer-input');
             let val = parseInt(input.value);
             if (val === Category1.targetCount) {
