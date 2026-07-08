@@ -11,21 +11,19 @@ const Category1 = {
         Category1.currentQ = 0;
         
         if (stageNum === 1) {
-            // Μοναδιαία (εναδικά) κλάσματα, αντικείμενα = παρονομαστής
-            const pool = [
-                [1,2],[1,2],[1,2],
-                [1,3],[1,3],[1,3],
-                [1,4],[1,4],[1,4],
-                [1,5],[1,5],[1,5],
-                [1,6],[1,6],[1,6],
-                [1,7],[1,7],
-                [1,8],[1,8],
-                [1,9],[1,9],
-            ];
-            Utils.shuffle(pool);
-            Category1.questions = pool.slice(0, 10).map(f => {
-                return { num: f[0], den: f[1], total: f[1], target: 1 };
-            });
+            // Εναδικά κλάσματα (αριθμητής = 1), αντικείμενα = παρονομαστής
+            const denominators = [];
+            while (denominators.length < 10) {
+                const den = Utils.randomInt(2, 12);
+                if (!denominators.includes(den)) denominators.push(den);
+            }
+            Utils.shuffle(denominators);
+            Category1.questions = denominators.map(den => ({
+                num: 1,
+                den,
+                total: den,
+                target: 1
+            }));
         }
         else if (stageNum === 2) {
             // Εναδικά κλάσματα, αντικείμενα > παρονομαστής
@@ -48,10 +46,10 @@ const Category1 = {
             });
         }
         else if (stageNum === 3) {
-            // Όλα τα κλάσματα, αντικείμενα = παρονομαστής
+            // Μη εναδικά κλάσματα (αριθμητής > 1), αντικείμενα = παρονομαστής
             for (let i = 0; i < 10; i++) {
                 let den = Utils.randomInt(3, 15);
-                let num = Utils.randomInt(1, den - 1);
+                let num = Utils.randomInt(2, den - 1);
                 Category1.questions.push({ num, den, total: den, target: num });
             }
         }
@@ -134,7 +132,8 @@ const Category1 = {
              setTimeout(() => Utils.setActiveInput('answer-input'), 50);
         } else {
              let objEmoji = Utils.getRandomObject();
-             promptHtml = `Επέλεξε τα ${Utils.renderFraction(q.num, q.den)}`;
+             const article = (Category1.stage === 1 || (Category1.stage === 2 && q.num === 1)) ? 'το' : 'τα';
+             promptHtml = `Επίλεξε ${article} ${Utils.renderFraction(q.num, q.den)}`;
              app.prepareGameArea(`Ερώτηση ${Category1.currentQ + 1} / ${Category1.questions.length}`, promptHtml);
              
              let area = document.getElementById('game-area');
